@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Code — Курс по вайб-кодингу</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <span class="logo-icon">◈</span>
+                <span class="logo-text">VibeCode</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#about">О курсе</a></li>
+                <li><a href="#program">Программа</a></li>
+                <li><a href="#mentor">Ментор</a></li>
+                <li><a href="#pricing">Тарифы</a></li>
+            </ul>
+            <a href="#pricing" class="btn-nav">Записаться</a>
+            <button class="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-particles" id="particles"></div>
+        <div class="container hero-content">
+            <div class="hero-badge">✦ курс 2026</div>
+            <h1 class="hero-title">
+                Пиши код<br>
+                <span class="gradient-text">с вайбом</span>
+            </h1>
+            <p class="hero-subtitle">
+                Освой искусство вайб-кодинга — современный подход к программированию, 
+                где код не просто работает, а ощущается. Чистота, эстетика, философия.
+            </p>
+            <div class="hero-cta">
+                <a href="#pricing" class="btn-glow">Начать обучение</a>
+                <a href="#about" class="btn-outline">Узнать больше</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">выпускников</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">97%</span>
+                    <span class="stat-label">трудоустройство</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">4.9</span>
+                    <span class="stat-label">рейтинг</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-scroll">
+            <span>скролль</span>
+            <div class="scroll-line"></div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="section about">
+        <div class="container">
+            <h2 class="section-title">Что такое <span class="gradient-text">вайб-кодинг</span>?</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <div class="card-icon">01</div>
+                    <h3>Эстетика кода</h3>
+                    <p>Код должен быть не только функциональным, но и красивым. Читаемость, консистентность, смысловые имена.</p>
+                </div>
+                <div class="about-card">
+                    <div class="card-icon">02</div>
+                    <h3>Минимализм</h3>
+                    <p>Никакого легаси-мусора. Только современные подходы, актуальные фреймворки и лаконичные решения.</p>
+                </div>
+                <div class="about-card">
+                    <div class="card-icon">03</div>
+                    <h3>Философия</h3>
+                    <p>Понимание "почему" за каждым решением. Архитектурное мышление, паттерны, принципы SOLID.</p>
+                </div>
+                <div class="about-card">
+                    <div class="card-icon">04</div>
+                    <h3>Vibe First</h3>
+                    <p>Код, который хочется показывать. Проекты, которыми гордишься. Комьюнити единомышленников.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What You'll Learn -->
+    <section class="section features">
+        <div class="container">
+            <h2 class="section-title">Что ты <span class="gradient-text">получишь</span></h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h4>Современный стек</h4>
+                    <p>React, TypeScript, Node.js, PostgreSQL — всё, что нужно в 2026</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h4>UI/UX навыки</h4>
+                    <p>Вайб-дизайн в интерфейсах. Анимации, микро-взаимодействия, внимание к деталям</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h4>Архитектура</h4>
+                    <p>Паттерны, SOLID, чистая архитектура — думай как senior</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h4>CI/CD & DevOps</h4>
+                    <p>Docker, GitHub Actions, деплой — полный цикл</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h4>Full-stack</h4>
+                    <p>Бэкенд, фронтенд, базы данных — всё своими руками</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💼</div>
+                    <h4>Портфолио</h4>
+                    <p>3 проекта уровня production для резюме</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program Section -->
+    <section id="program" class="section program">
+        <div class="container">
+            <h2 class="section-title">Программа <span class="gradient-text">обучения</span></h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="module-number">Модуль 1</span>
+                        <h3>Фундамент вайба</h3>
+                        <ul>
+                            <li>Философия вайб-кодинга</li>
+                            <li>Чистый код и его принципы</li>
+                            <li>TypeScript — основа типизации</li>
+                            <li>VS Code настройка под вайб</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="module-number">Модуль 2</span>
+                        <h3>Frontend Vibe</h3>
+                        <ul>
+                            <li>React с хуками и современными паттернами</li>
+                            <li>Styled-components & CSS modules</li>
+                            <li>Анимации и transitions</li>
+                            <li>State management (Zustand/Jotai)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="module-number">Модуль 3</span>
+                        <h3>Backend Vibe</h3>
+                        <ul>
+                            <li>Node.js + Express/Nest</li>
+                            <li>PostgreSQL & Prisma</li>
+                            <li>REST vs GraphQL</li>
+                            <li>Авторизация и безопасность</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="module-number">Модуль 4</span>
+                        <h3>Production Vibe</h3>
+                        <ul>
+                            <li>Docker & Docker Compose</li>
+                            <li>CI/CD с GitHub Actions</li>
+                            <li>Deployment (Vercel/Railway/Render)</li>
+                            <li>Мониторинг и логирование</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <span class="module-number">Модуль 5</span>
+                        <h3>Проектная работа</h3>
+                        <ul>
+                            <li>Полноценное full-stack приложение</li>
+                            <li>Code review от ментора</li>
+                            <li>Публикация в портфолио</li>
+                            <li>Подготовка к собеседованиям</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mentor Section -->
+    <section id="mentor" class="section mentor">
+        <div class="container">
+            <h2 class="section-title">Твой <span class="gradient-text">ментор</span></h2>
+            <div class="mentor-card">
+                <div class="mentor-image">
+                    <div class="mentor-avatar">
+                        <span>VC</span>
+                    </div>
+                    <div class="mentor-badge">★ Super Mentor</div>
+                </div>
+                <div class="mentor-info">
+                    <h3>Алексей "VibeMaster" Волков</h3>
+                    <p class="mentor-title">Senior Full-stack Developer & Tech Lead</p>
+                    <div class="mentor-stats">
+                        <span>10+ лет опыта</span>
+                        <span>•</span>
+                        <span>200+ учеников</span>
+                        <span>•</span>
+                        <span>Работал в Яндексе, Тинькофф, Авито</span>
+                    </div>
+                    <p class="mentor-bio">
+                        Автор методологии вайб-кодинга. Верю, что код — это искусство. 
+                        Помогаю студентам не просто научиться программировать, 
+                        а писать код, которым гордишься. Мой код — мой вайб.
+                    </p>
+                    <div class="mentor-skills">
+                        <span>TypeScript</span>
+                        <span>React</span>
+                        <span>Node.js</span>
+                        <span>PostgreSQL</span>
+                        <span>AWS</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="section pricing">
+        <div class="container">
+            <h2 class="section-title">Выбери свой <span class="gradient-text">вайб</span></h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Start</h3>
+                        <div class="price">
+                            <span class="price-currency">₽</span>
+                            <span class="price-value">19,900</span>
+                        </div>
+                        <p>Базовый доступ</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>✓ Все 5 модулей</li>
+                        <li>✓ 50+ уроков</li>
+                        <li>✓ Доступ 3 месяца</li>
+                        <li>✓ Чат сообщества</li>
+                        <li>✗ Code review</li>
+                        <li>✗ Менторские созвоны</li>
+                    </ul>
+                    <a href="#" class="btn-pricing" onclick="selectPlan('start')">Выбрать</a>
+                </div>
+                
+                <div class="pricing-card featured">
+                    <div class="featured-badge">★ Хит продаж</div>
+                    <div class="pricing-header">
+                        <h3>Pro</h3>
+                        <div class="price">
+                            <span class="price-currency">₽</span>
+                            <span class="price-value">39,900</span>
+                        </div>
+                        <p>Полный погруз</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>✓ Всё из Start</li>
+                        <li>✓ Персональный code review</li>
+                        <li>✓ 4 созвона с ментором</li>
+                        <li>✓ Доступ 6 месяцев</li>
+                        <li>✓ Помощь с портфолио</li>
+                        <li>✓ Сертификат</li>
+                    </ul>
+                    <a href="#" class="btn-pricing glow" onclick="selectPlan('pro')">Записаться</a>
+                </div>
+                
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Elite</h3>
+                        <div class="price">
+                            <span class="price-currency">₽</span>
+                            <span class="price-value">79,900</span>
+                        </div>
+                        <p>Максимальный результат</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>✓ Всё из Pro</li>
+                        <li>✓ Безлимит code review</li>
+                        <li>✓ 12 созвонов с ментором</li>
+                        <li>✓ Доступ навсегда</li>
+                        <li>✓ Трудоустройство</li>
+                        <li>✓ Личный наставник</li>
+                    </ul>
+                    <a href="#" class="btn-pricing" onclick="selectPlan('elite')">Выбрать</a>
+                </div>
+            </div>
+            <p class="pricing-note">* Первые 7 дней — гарантия возврата. Без вопросов.</p>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section testimonials">
+        <div class="container">
+            <h2 class="section-title">Отзывы <span class="gradient-text">выпускников</span></h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p>"До курса писал код, который работал, но после — пишу код, которым горжусь. Вайб-кодинг изменил моё отношение к программированию полностью."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">М</div>
+                        <div>
+                            <strong>Михаил К.</strong>
+                            <span>Frontend Developer, Yandex</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p>"Прошёл 5 курсов до этого — ни один не дал столько практики и реального понимания. Теперь я senior developer в топовой компании."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">А</div>
+                        <div>
+                            <strong>Анна С.</strong>
+                            <span>Full-stack, Тинькофф</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p>"Алексей — ментор с большой буквы. Не просто учит коду, а учит думать. Это бесценно. Уже через 3 месяца взяли на работу."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">Д</div>
+                        <div>
+                            <strong>Денис П.</strong>
+                            <span>Backend, Avito</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section faq">
+        <div class="container">
+            <h2 class="section-title">Вопросы и <span class="gradient-text">ответы</span></h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Нужен ли опыт для старта?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Базовые знания JavaScript будут полезны, но не обязательны. Мы начинаем с азов и постепенно переходим к продвинутым темам. Главное — желание учиться и писать красивый код.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Сколько времени занимает курс?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Оптимально — 3-4 месяца при нагрузке 10-15 часов в неделю. Но доступ к материалам остаётся навсегда (в тарифах Pro и Elite), можно учиться в своём темпе.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Что если курс не подойдёт?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Гарантия возврата 7 дней. Если поймёшь, что это не твой вайб — вернём деньги без вопросов. Риски минимальны.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Помогаете с трудоустройством?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>В тарифе Elite — да, полное сопровождение: резюме, подготовка к собеседованиям, рекомендации к партнёрам. В Pro — консультации по карьере.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Готов поймать свой <span class="gradient-text">вайб</span>?</h2>
+                <p>Запишися сейчас и получи бонусный модуль "Вайб-инструменты" в подарок</p>
+                <div class="cta-buttons">
+                    <a href="#pricing" class="btn-cta-primary">Записаться на курс</a>
+                    <span class="cta-note">Осталось 12 мест на этот поток</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <span class="logo-icon">◈</span>
+                        <span class="logo-text">VibeCode</span>
+                    </div>
+                    <p>Курс по вайб-кодингу №1 в России. Пиши код с вайбом.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Навигация</h4>
+                    <ul>
+                        <li><a href="#about">О курсе</a></li>
+                        <li><a href="#program">Программа</a></li>
+                        <li><a href="#mentor">Ментор</a></li>
+                        <li><a href="#pricing">Тарифы</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Контакты</h4>
+                    <ul>
+                        <li><a href="mailto:hello@vibecode.ru">hello@vibecode.ru</a></li>
+                        <li><a href="#">Telegram: @vibecode</a></li>
+                        <li><a href="#">YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 VibeCode. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
