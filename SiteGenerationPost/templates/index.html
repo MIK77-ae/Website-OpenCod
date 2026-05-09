@@ -166,9 +166,29 @@
             margin-bottom: 16px;
         }
 
-        .result-header h2 {
+.result-header h2 {
             font-size: 20px;
             color: var(--text-color);
+        }
+
+        .link-status {
+            font-size: 13px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .link-status.success {
+            display: block;
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+
+        .link-status.warning {
+            display: block;
+            background-color: #FEF3C7;
+            color: #92400E;
         }
 
         .post-content {
@@ -212,6 +232,10 @@
             margin-left: 12px;
         }
 
+        .copy-message.error {
+            color: var(--error-color);
+        }
+
         .copy-message.show {
             display: inline;
         }
@@ -249,14 +273,14 @@
             <div class="error-message" id="errorMessage"></div>
 
             <div class="form-group">
-                <label for="productUrl">Ссылка на товар <span class="required">*</span></label>
-                <input type="url" id="productUrl" placeholder="https://www.ozon.ru/product/...">
-                <div class="hint">🔗 Вставьте ссылку без лишних параметров - только основной адрес до товара</div>
+                <label for="productUrl">Ссылка на товар</label>
+                <input type="url" id="productUrl" placeholder="https://market.yandex.ru/...">
             </div>
 
             <div class="form-group">
-                <label for="productDescription">Описание товара (если ссылка не сработает)</label>
-                <textarea id="productDescription" rows="3" placeholder="Например: Мужская сумка через плечо, натуральная кожа, коричневый"></textarea>
+                <label for="productDescription">Описание товара <span class="required">*</span></label>
+                <textarea id="productDescription" rows="4" placeholder="Например: iPhone 15 Pro 512GB, синий, Apple A17 Pro"></textarea>
+                <div class="hint">Обязательно - опишите товар или вставьте ссылку выше</div>
             </div>
 
             <div class="form-group">
@@ -264,11 +288,19 @@
                 <select id="tone">
                     <option value="friendly">Дружелюбное 😊</option>
                     <option value="energetic">Энергичное 🔥</option>
-                    <option value="professional">Профессиональное 💼</option>
-                    <option value="luxury">Премиум ✨</option>
-                    <option value="humor">С юмором 😄</option>
+                    <option value="humor_soft">С юмором (мягкий) 😄</option>
+                    <option value="humor_irony">С юмором (ирония) 😏</option>
+                    <option value="humor_crazy">С юмором (экстрим) 🤪</option>
                     <option value="curious">Интригующее 🤔</option>
                     <option value="inspirational">Вдохновляющее 🌟</option>
+                    <option value="romantic">Романтичное 💕</option>
+                    <option value="urgent">Срочное ⏰</option>
+                    <option value="trust">Надёжное 🤝</option>
+                    <option value="professional">Профессиональное 💼</option>
+                    <option value="luxury">Премиум ✨</option>
+                    <option value="expert">Экспертное 🎓</option>
+                    <option value="fun">Развлекательное 🎉</option>
+                    <option value="minimal">Краткое 📝</option>
                 </select>
             </div>
 
@@ -281,6 +313,7 @@
             <div class="result-header">
                 <h2>✅ Готовый пост</h2>
             </div>
+            <div class="link-status" id="linkStatus"></div>
             <div class="post-content" id="postContent"></div>
             <button class="btn-copy" id="copyBtn">
                 📋 Скопировать пост
@@ -296,8 +329,11 @@
         const postContent = document.getElementById('postContent');
         const copyMessage = document.getElementById('copyMessage');
         const errorMessage = document.getElementById('errorMessage');
+        const linkStatus = document.getElementById('linkStatus');
+        const linkStatus = document.getElementById('linkStatus');
 
-        async function generatePost() {
+async function generatePost() {
+            console.log('Начало генерации...');
             generateBtn.disabled = true;
             generateBtn.innerHTML = '<span class="spinner"></span> Генерация...';
 
@@ -308,13 +344,61 @@
             const productDescription = document.getElementById('productDescription').value;
             const tone = document.getElementById('tone').value;
 
-            if (!productUrl) {
-                errorMessage.textContent = 'Добавьте ссылку на товар';
+            console.log('URL:', productUrl, 'Description:', productDescription, 'Tone:', tone);
+
+            if (!productUrl && !productDescription) {
+                errorMessage.textContent = 'Добавьте ссылку или описание товара';
                 errorMessage.classList.add('show');
                 generateBtn.disabled = false;
                 generateBtn.textContent = 'Создать пост с ИИ';
                 return;
             }
+
+            try {
+                console.log('Отправка запроса...');
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        product_url: productUrl,
+                        product_description: productDescription,
+                        tone: tone
+                    })
+                });
+
+                console.log('Ответ получен:', response.status);
+                const data = await response.json();
+                console.log('Данные:', data);
+
+                if (data.success) {
+                    postContent.textContent = data.post;
+                    resultCard.classList.add('show');
+                    
+                    linkStatus.className = 'link-status';
+                    if (data.link_read) {
+                        linkStatus.textContent = '✅ Ссылка считана!';
+                        linkStatus.classList.add('success');
+                    } else {
+                        linkStatus.textContent = '⚠️ Использовано описание';
+                        linkStatus.classList.add('warning');
+                    }
+                } else {
+                    console.log('Ошибка:', data.error);
+                    errorMessage.textContent = data.error || 'Ошибка генерации';
+                    errorMessage.classList.add('show');
+                }
+
+            } catch (error) {
+                console.log('Exception:', error);
+                errorMessage.textContent = 'Ошибка: ' + error.message;
+                errorMessage.classList.add('show');
+            }
+
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Создать пост с ИИ';
+        }
 
             try {
                 const response = await fetch('/generate', {
@@ -331,16 +415,30 @@
 
                 const data = await response.json();
 
-                if (data.success) {
+if (data.success) {
                     postContent.textContent = data.post;
                     resultCard.classList.add('show');
+                    
+                    // Показываем статус ссылки
+                    linkStatus.className = 'link-status';
+                    if (data.link_read) {
+                        linkStatus.textContent = '✅ Ссылка считана!';
+                        linkStatus.classList.add('success');
+                    } else {
+                        linkStatus.textContent = '⚠️ Использовано описание';
+                        linkStatus.classList.add('warning');
+                    }
+                } else {
+                        linkStatus.classList.add('error');
+                        linkStatus.textContent = '⚠️ Ссылка не считана. Использовано описание.';
+                    }
                 } else {
                     errorMessage.textContent = data.error;
                     errorMessage.classList.add('show');
                 }
 
             } catch (error) {
-                errorMessage.textContent = 'Что-то пошло не так. Попробуйте ещё раз.';
+                errorMessage.textContent = 'Ошибка: ' + error.message + '. Попробуйте ещё раз.';
                 errorMessage.classList.add('show');
             }
 
@@ -350,12 +448,47 @@
 
         function copyPost() {
             const text = postContent.textContent;
-            navigator.clipboard.writeText(text).then(() => {
+            
+            // Пробуем использовать clipboard API
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    copyMessage.textContent = 'Пост скопирован!';
+                    copyMessage.classList.add('show');
+                    setTimeout(() => {
+                        copyMessage.classList.remove('show');
+                    }, 2000);
+                }).catch(err => {
+                    // Fallback для старых браузеров
+                    copyToClipboardFallback(text);
+                });
+            } else {
+                // Fallback
+                copyToClipboardFallback(text);
+            }
+        }
+        
+        function copyToClipboardFallback(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                copyMessage.textContent = 'Пост скопирован!';
                 copyMessage.classList.add('show');
                 setTimeout(() => {
                     copyMessage.classList.remove('show');
                 }, 2000);
-            });
+            } catch (err) {
+                copyMessage.textContent = 'Не удалось скопировать';
+                copyMessage.classList.add('show');
+                setTimeout(() => {
+                    copyMessage.classList.remove('show');
+                }, 2000);
+            }
+            document.body.removeChild(textarea);
         }
 
         generateBtn.addEventListener('click', generatePost);

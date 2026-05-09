@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор постов для товаров</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- ==================== ШАПКА САЙТА ==================== -->
+    <header class="header">
+        <div class="container">
+            <h1>🎯 Генератор постов</h1>
+            <p>Создавайте уникальные посты для ваших товаров с помощью ИИ</p>
+        </div>
+    </header>
+
+    <!-- ==================== ОСНОВНОЙ КОНТЕНТ ==================== -->
+    <main class="container">
+        <div class="form-card">
+            <!-- ================ ФОРМА ВВОДА ================ -->
+            <form id="postForm">
+                <!-- Поле: Название товара -->
+                <div class="form-group">
+                    <label for="product">Название товара</label>
+                    <input type="text" 
+                           id="product" 
+                           name="product" 
+                           placeholder="Например: Умная лампочка">
+                </div>
+
+                <!-- Поле: Описание товара (обязательное) -->
+                <div class="form-group">
+                    <label for="description">
+                        Описание товара <span class="required">*</span>
+                    </label>
+                    <textarea id="description" 
+                              name="description" 
+                              rows="4" 
+                              placeholder="Опишите товар: характеристики, особенности, преимущества..."
+                              required></textarea>
+                </div>
+
+                <!-- Поле: Цена или выгода -->
+                <div class="form-group">
+                    <label for="price_info">Цена или выгода</label>
+                    <input type="text" 
+                           id="price_info" 
+                           name="price_info" 
+                           placeholder="Например: 1990 ₽ или Скидка 20%">
+                </div>
+
+                <!-- Поле: Выбор тона текста -->
+                <div class="form-group">
+                    <label>Тон текста</label>
+                    <div class="mood-selector">
+                        {% for key, mood in moods.items() %}
+                        <label class="mood-option">
+                            <input type="radio" 
+                                   name="mood" 
+                                   value="{{ key }}" 
+                                   {% if loop.first %}checked{% endif %}>
+                            <span class="mood-label">
+                                <span class="mood-icon">{{ loop.index }}</span>
+                                {{ mood.description }}
+                            </span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="mood-hint">
+                        <small>1 — Дружелюбный | 2 — Восторженный | 3 — Деловой | 4 — Спокойный</small>
+                    </div>
+                </div>
+
+                <!-- Кнопка: Сформировать пост -->
+                <button type="submit" class="btn-generate">
+                    ✨ Сформировать пост
+                </button>
+            </form>
+        </div>
+
+        <!-- ================ БЛОК С ГОТОВЫМ ПОСТОМ ================ -->
+        <div class="result-card" id="resultCard">
+            <h2>📝 Готовый пост</h2>
+            <div class="result-content" id="resultContent">
+                <p class="placeholder-text">
+                    Заполните форму и нажмите «Сформировать пост»
+                </p>
+            </div>
+            
+            <!-- Кнопка: Скопировать пост -->
+            <button type="button" 
+                    class="btn-copy" 
+                    id="copyBtn" 
+                    style="display: none;"
+                    onclick="copyPost()">
+                📋 Скопировать пост
+            </button>
+
+            <!-- Сообщение после копирования -->
+            <div class="copy-message" id="copyMessage" style="display: none;">
+                ✅ Пост скопирован
+            </div>
+        </div>
+    </main>
+
+    <!-- ==================== ПОДВАЛ ==================== -->
+    <footer class="footer">
+        <p>Генератор постов — powered by ProxyAPI</p>
+    </footer>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // -----------------------------------------------------------------
+        // ОБРАБОТЧИК ФОРМЫ
+        // -----------------------------------------------------------------
+        document.getElementById('postForm').addEventListener('submit', async function(e) {
+            // Отменяем стандартную отправку формы
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitBtn = document.querySelector('.btn-generate');
+
+            // Показываем состояние загрузки
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Генерация...';
+
+            try {
+                // Отправляем данные на сервер
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Показываем готовый пост
+                    showResult(data.post);
+                } else {
+                    // Показываем ошибку
+                    showError(data.error);
+                }
+            } catch (error) {
+                showError('Что-то пошло не так. Попробуйте ещё раз.');
+            } finally {
+                // Возвращаем кнопку в нормальное состояние
+                submitBtn.disabled = false;
+                submitBtn.textContent = '✨ Сформировать пост';
+            }
+        });
+
+        /**
+         * Показывает готовый пост
+         * @param {string} postText - текст поста
+         */
+        function showResult(postText) {
+            const resultContent = document.getElementById('resultContent');
+            const copyBtn = document.getElementById('copyBtn');
+            const copyMessage = document.getElementById('copyMessage');
+
+            // Преобразуем текст в HTML для переносов строк
+            resultContent.innerHTML = formatPost(postText);
+            
+            // Показываем кнопку копирования
+            copyBtn.style.display = 'inline-block';
+            copyBtn.dataset.post = postText;
+
+            // Скрываем сообщение о копировании
+            copyMessage.style.display = 'none';
+        }
+
+        /**
+         * Показывает сообщение об ошибке
+         * @param {string} errorText - текст ошибки
+         */
+        function showError(errorText) {
+            const resultContent = document.getElementById('resultContent');
+            const copyBtn = document.getElementById('copyBtn');
+
+            resultContent.innerHTML = `<p class="error-text">⚠️ ${errorText}</p>`;
+            copyBtn.style.display = 'none';
+        }
+
+        /**
+         * Форматирует текст поста для отображения
+         * @param {string} text - исходный текст
+         * @returns {string} HTML с переносами строк
+         */
+        function formatPost(text) {
+            // Заменяем переносы строк на теги <br>
+            return text.replace(/\n/g, '<br>');
+        }
+
+        /**
+         * Копирует пост в буфер обмена
+         */
+        async function copyPost() {
+            const copyBtn = document.getElementById('copyBtn');
+            const copyMessage = document.getElementById('copyMessage');
+            const postText = copyBtn.dataset.post;
+
+            try {
+                // Копируем текст в буфер обмена
+                await navigator.clipboard.writeText(postText);
+
+                // Показываем сообщение об успехе
+                copyMessage.style.display = 'block';
+                copyBtn.textContent = '✅ Скопировано!';
+
+                // Скрываем сообщение через 3 секунды
+                setTimeout(() => {
+                    copyMessage.style.display = 'none';
+                    copyBtn.textContent = '📋 Скопировать пост';
+                }, 3000);
+
+            } catch (error) {
+                // Если буфер обмена недоступен
+                alert('Не удалось скопировать. Выделите текст и скопируйте вручную.');
+            }
+        }
+    </script>
+</body>
+</html>

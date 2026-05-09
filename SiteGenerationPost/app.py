@@ -1,7 +1,5 @@
 """
 Генератор постов для товаров на Flask с ProxyAPI
-
-Использует языковую модель для генерации оригинальных постов по ссылке или описанию.
 """
 
 from flask import Flask, render_template, request, jsonify
@@ -23,78 +21,125 @@ MODEL = "gpt-5.4-mini"
 # ============================================================
 
 TONES = {
-    "friendly": "Дружелюбный, теплый, располагающий",
+    "friendly": "Дружелюбный, тёплый, располагающий",
     "energetic": "Энергичный, динамичный, мотивирующий",
     "professional": "Профессиональный, деловой, убедительный",
     "luxury": "Премиум, элегантный, эксклюзивный",
-    "humor": "С юмором, веселый, легкий",
+    "humor_soft": "С мягким юмором, лёгкий, весёлый",
+    "humor_irony": "С иронией, с подтекстом, умный",
+    "humor_crazy": "Экстремальный юмор, яркий, эмоциональный",
     "curious": "Интригующий, загадочный, вызывающий интерес",
-    "inspirational": "Вдохновляющий, мотивирующий, позитивный"
+    "inspirational": "Вдохновляющий, мотивирующий, позитивный",
+    "romantic": "Романтичный, нежный, чувственный",
+    "urgent": "Срочный, спешный, побуждающий",
+    "trust": "Доверительный, надёжный, проверенный",
+    "expert": "Экспертный, авторитетный, профессиональный",
+    "fun": "Развлекательный, игривый, расслабленный",
+    "minimal": "Краткий, лаконичный, без лишних слов"
 }
 
 
-def get_product_info_from_url(url):
-    """Пытается получить информацию о товаре со страницы"""
+def parse_product_url(url):
+    """Быстрый парсинг товара со страницы"""
     try:
-        clean_url = url.split('?')[0] if '?' in url else url
-        
-        # Более полная эмуляция браузера
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'ru-RU,ru;q=0.9,en;q=0.8',
         }
         
-        response = requests.get(clean_url, headers=headers, timeout=15)
+        response = requests.get(url, headers=headers, timeout=8)
         
-        if response.status_code == 200:
-            text = response.text
-            
-            # Ищем название товара
-            title_match = re.search(r'<title>([^<]+)</title>', text, re.I)
-            if title_match:
-                title = title_match.group(1).split('|')[0].split('-')[0].strip()
-            else:
-                # Пробуем найти в JSON
-                title_match = re.search(r'"name"\s*:\s*"([^"]+)"', text)
-                title = title_match.group(1) if title_match else None
-            
-            # Ищем цену - несколько паттернов
-            price = None
-            for pattern in [r'"price"\s*:\s*(\d+)', r'(\d+[\d\s]*)\s*₽', r'data-price="(\d+)"']:
-                match = re.search(pattern, text)
-                if match:
-                    price = match.group(1).strip()
-                    break
-            
-            # Ищем рейтинг
-            rating_match = re.search(r'"rating"\s*:\s*(\d+\.?\d*)', text)
-            rating = rating_match.group(1) if rating_match else None
-            
-            return {
-                'title': title,
-                'price': price,
-                'rating': rating,
-                'url': clean_url
-            }
-        elif response.status_code == 403:
-            return {'error': 'Доступ запрещён - защита сайта'}
-        elif response.status_code == 404:
-            return {'error': 'Товар не найден'}
-        else:
-            return {'error': f'Ошибка: {response.status_code}'}
+        if response.status_code != 200:
+            return None, f"Ошибка {response.status_code}"
+        
+        text = response.text
+        
+        # Определяем сайт
+        is_yandex = 'yandex.ru' in url.lower()
+        is_ozon = 'ozon.ru' in url.lower()
+        is_wb = 'wildberries.ru' in url.lower()
+        
+        title = None
+        price = None
+        
+        # Яндекс
+        if is_yandex:
+            # Ищем title
+            match = re.search(r'<title>([^<]+)</title>', text, re.I)
+            if match:
+                title = match.group(1).split('|')[0].split('-')[0].strip()
+            # Ищем цену
+            match = re.search(r'(\d+[\d\s]*)\s*₽', text)
+            if match:
+                price = match.group(1).strip()
+        
+        # Ozon
+        elif is_ozon:
+            match = re.search(r'<title>([^<]+)</title>', text, re.I)
+            if match:
+                title = match.group(1).split('|')[0].strip()
+            match = re.search(r'(\d+[\d\s]*)\s*₽', text)
+            if match:
+                price = match.group(1).strip()
+        
+        # Wildberries
+        elif is_wb:
+            match = re.search(r'<title>([^<]+)</title>', text, re.I)
+            if match:
+                title = match.group(1).split('|')[0].strip()
+            match = re.search(r'(\d+[\d\s]*)\s*₽', text)
+            if match:
+                price = match.group(1).strip()
+        
+        # Общее
+        if not title:
+            match = re.search(r'<title>([^<]+)</title>', text, re.I)
+            if match:
+                title = match.group(1).split('|')[0].split('-')[0].strip()
+        
+        if title or price:
+            return {'title': title, 'price': price, 'url': url}, None
+        
+        return None, "Данные не найдены"
     
     except requests.exceptions.Timeout:
-        return {'error': 'Время ожидания истекло'}
+        return None, "Тайм-аут"
     except Exception as e:
-        return {'error': f'Ошибка: {str(e)}'}
+        return None, str(e)[:30]
 
 
-def generate_post_with_ai(product_info, tone):
+def generate_post_with_ai(product_url, product_description, tone):
     """Генерирует пост с помощью языковой модели ProxyAPI"""
     tone_description = TONES.get(tone, TONES["friendly"])
+    
+    # Пробуем прочитать ссылку
+    product_info = ""
+    link_read = False
+    
+    if product_url and not product_url.startswith('http'):
+        product_url = 'https://' + product_url
+    
+    if product_url:
+        info, error = parse_product_url(product_url)
+        
+        if info and info.get('title'):
+            link_read = True
+            product_info += f"Название: {info['title']}\n"
+            if info.get('price'):
+                product_info += f"Цена: {info['price']} ₽\n"
+        elif product_url:
+            product_info += f"Ссылка: {product_url}\n"
+    
+    # Добавляем описание
+    if product_description:
+        if product_info:
+            product_info += f"Описание: {product_description}\n"
+        else:
+            product_info = f"Описание: {product_description}\n"
+    
+    if not product_info:
+        product_info = "Товар без описания"
     
     prompt = f"""Ты - профессиональный копирайтер. Создай маркетинговый пост о товаре.
 
@@ -132,19 +177,14 @@ def generate_post_with_ai(product_info, tone):
         if response.status_code == 200:
             result = response.json()
             post = result["choices"][0]["message"]["content"]
-            return post, None
+            return post, link_read, None
         else:
             error_msg = f"Ошибка API: {response.status_code}"
-            try:
-                error_data = response.json()
-                error_msg += f" - {error_data.get('error', {}).get('message', '')}"
-            except:
-                pass
-            return None, error_msg
+            return None, False, error_msg
     except requests.exceptions.Timeout:
-        return None, "Время ожидания истекло"
+        return None, False, "Время ожидания истекло"
     except Exception as e:
-        return None, f"Ошибка: {str(e)}"
+        return None, False, f"Ошибка: {str(e)}"
 
 
 @app.route('/')
@@ -160,56 +200,19 @@ def generate():
     product_description = data.get('product_description', '').strip()
     tone = data.get('tone', 'friendly')
 
-    # Обязательно ссылка
-    if not product_url:
+    if not product_url and not product_description:
         return jsonify({
             'success': False,
-            'error': 'Добавьте ссылку на товар'
+            'error': 'Добавьте ссылку или описание товара'
         })
 
-    # Добавляем https если нужно
-    if not product_url.startswith(('http://', 'https://')):
-        product_url = 'https://' + product_url
-
-    # Пробуем получить данные со страницы
-    info = get_product_info_from_url(product_url)
-    
-    # Если не получилось и есть описание - используем его
-    if info and 'error' in info:
-        if not product_description:
-            return jsonify({
-                'success': False,
-                'error': 'Не удалось прочитать ссылку. Добавьте описание товара вручную.'
-            })
-        # Используем описание вместо ссылки
-        product_info = f"Ссылка: {product_url.split('?')[0]}\nОписание: {product_description}\n"
-    elif info:
-        # Успешно получили данные
-        product_info = ""
-        if info.get('title'):
-            product_info += f"Название: {info['title']}\n"
-        if info.get('price'):
-            product_info += f"Цена: {info['price']} ₽\n"
-        if info.get('rating'):
-            product_info += f"Рейтинг: {info['rating']}/5\n"
-        # Дополняем описанием если есть
-        if product_description:
-            product_info += f"Доп. описание: {product_description}\n"
-    else:
-        # Нет данных - используем описание или URL
-        if product_description:
-            product_info = f"Описание: {product_description}\n"
-        else:
-            product_info = f"Ссылка на товар: {product_url}\n"
-
-    # Генерируем пост
-    post, error = generate_post_with_ai(product_info, tone)
+    post, link_read, error = generate_post_with_ai(product_url, product_description, tone)
 
     if error:
         return jsonify({'success': False, 'error': error})
 
-    return jsonify({'success': True, 'post': post})
+    return jsonify({'success': True, 'post': post, 'link_read': link_read})
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.1.14', port=5002, debug=False)
+    app.run(host='192.168.1.14', port=5003, debug=False)
