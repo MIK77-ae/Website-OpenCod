@@ -154,6 +154,24 @@ def remove_favorite(post_id):
     })
 
 
+@app.route('/post/update', methods=['POST'])
+def update_post():
+    """Обновляет текст поста (после редактирования)."""
+    data = request.get_json()
+    post_text = data.get('post_text', '')
+    
+    if not post_text:
+        return jsonify({'success': False, 'error': 'Пустой пост'})
+    
+    # Обновляем пост в сессии
+    session['current_post'] = post_text
+    
+    return jsonify({
+        'success': True,
+        'post': post_text
+    })
+
+
 # =============================================================================
 # ПУБЛИКАЦИЯ В ВК
 # =============================================================================
