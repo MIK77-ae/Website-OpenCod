@@ -1,14 +1,12 @@
 // AI-Дайджест - Скрипт для поиска и фильтрации
 
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
     const filterBtns = document.querySelectorAll('.filter-btn');
     const cards = document.querySelectorAll('.card');
     const noResults = document.getElementById('noResults');
     const resultsCount = document.getElementById('resultsCount');
 
     let currentFilter = 'all';
-    let searchQuery = '';
 
     // Функция фильтрации карточек
     function filterCards() {
@@ -16,19 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         cards.forEach(card => {
             const cardTags = card.dataset.tags.split(',');
-            const cardTitle = card.querySelector('.card-title').textContent.toLowerCase();
-            const cardDesc = card.querySelector('.card-description').textContent.toLowerCase();
-
-            // Проверка поиска
-            const matchesSearch = searchQuery === '' ||
-                cardTitle.includes(searchQuery) ||
-                cardDesc.includes(searchQuery);
 
             // Проверка фильтра
             const matchesFilter = currentFilter === 'all' ||
                 cardTags.includes(currentFilter);
 
-            if (matchesSearch && matchesFilter) {
+            if (matchesFilter) {
                 card.style.display = 'block';
                 card.classList.add('visible');
                 visibleCount++;
@@ -45,13 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
         noResults.style.display = visibleCount === 0 ? 'flex' : 'none';
     }
 
-    // Обработчик поиска
-    searchInput.addEventListener('input', function(e) {
-        searchQuery = e.target.value.toLowerCase().trim();
-        filterCards();
-    });
-
-    // Обработчик фильтров
+    // Обработчик фильтров (кнопки сверху)
     filterBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             // Удаление active у всех кнопок
@@ -61,6 +46,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
             currentFilter = this.dataset.tag;
             filterCards();
+        });
+    });
+
+    // Обработчик клика по тегам внутри карточек
+    document.querySelectorAll('.card-tags .tag').forEach(tag => {
+        tag.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tagText = this.textContent;
+
+            // Удаление active у всех кнопок
+            filterBtns.forEach(b => b.classList.remove('active'));
+
+            // Поиск кнопки с этим тегом и активация
+            filterBtns.forEach(btn => {
+                if (btn.dataset.tag === tagText) {
+                    btn.classList.add('active');
+                }
+            });
+
+            currentFilter = tagText;
+            filterCards();
+
+            // Прокрутка к фильтрам
+            document.querySelector('.filters-section').scrollIntoView({
+                behavior: 'smooth'
+            });
         });
     });
 
@@ -79,12 +90,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Сохранение состояния в localStorage
     function saveState() {
         localStorage.setItem('ai-digest-filter', currentFilter);
-        localStorage.setItem('ai-digest-search', searchQuery);
     }
 
     function loadState() {
         const savedFilter = localStorage.getItem('ai-digest-filter');
-        const savedSearch = localStorage.getItem('ai-digest-search');
 
         if (savedFilter && savedFilter !== 'all') {
             currentFilter = savedFilter;
@@ -94,15 +103,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
-
-        if (savedSearch) {
-            searchQuery = savedSearch;
-            searchInput.value = searchQuery;
-        }
     }
 
     // Сохраняем состояние при изменении
-    searchInput.addEventListener('change', saveState);
     filterBtns.forEach(btn => btn.addEventListener('click', saveState));
 
     // Загружаем состояние
