@@ -1,236 +1,215 @@
 """
-Генератор постов для товаров на Flask
+Генератор постов для товаров на Flask с ProxyAPI
 
-Простой генератор маркетинговых постов без использования нейросетей.
-Использует шаблоны для создания продающих текстов.
+Использует языковую модель для генерации оригинальных постов по ссылке или описанию.
 """
 
 from flask import Flask, render_template, request, jsonify
-import random
+import requests
+import re
 
 app = Flask(__name__)
 
-
 # ============================================================
-# НАСТРОЙКИ ГЕНЕРАТОРА - легко изменить стиль постов
-# ============================================================
-
-# Общий тон постов
-# Варианты: "energetic" (энергичный), "professional" (профессиональный),
-#           "friendly" (дружелюбный), "luxury" (премиум)
-POST_TONE = "friendly"
-
-# Длина поста: "short" (короткий), "medium" (средний), "long" (длинный)
-POST_LENGTH = "medium"
-
-# Количество эмодзи: 1-3
-EMOJI_COUNT = 2
-
-# Стиль заголовков: "question" (вопрос), "statement" (утверждение), "benefit" (выгода)
-TITLE_STYLE = "benefit"
-
-# Стиль CTA (призыва к действию): "soft" (мягкий), "strong" (активный), "curious" (интригующий)
-CTA_STYLE = "soft"
-
-# Количество хэштегов
-HASHTAG_COUNT = 5
-
-
-# ============================================================
-# ШАБЛОНЫ ПО РАЗНЫМ НАСТРОЕНИЯМ
+# НАСТРОЙКИ PROXYAPI
 # ============================================================
 
-# Эмодзи для разных настроений постов
-EMOJI_SETS = {
-    "energetic": ["🔥", "💪", "⚡", "🚀", "✨", "🎯"],
-    "professional": ["📊", "💼", "🎓", "✅", "📈", "🔧"],
-    "friendly": ["😊", "❤️", "👍", "🎉", "💛", "🙌"],
-    "luxury": ["💎", "👑", "🌟", "✨", "🎩", "🔮"]
+PROXY_API_KEY = "sk-Wn6aMngfsrbCRtoN30ILHSfNFLVJR1mp"
+PROXY_API_URL = "https://api.proxyapi.ru/openai/v1/chat/completions"
+MODEL = "gpt-5.4-mini"
+
+# ============================================================
+# НАСТРОЙКИ ГЕНЕРАТОРА
+# ============================================================
+
+TONES = {
+    "friendly": "Дружелюбный, теплый, располагающий",
+    "energetic": "Энергичный, динамичный, мотивирующий",
+    "professional": "Профессиональный, деловой, убедительный",
+    "luxury": "Премиум, элегантный, эксклюзивный",
+    "humor": "С юмором, веселый, легкий",
+    "curious": "Интригующий, загадочный, вызывающий интерес",
+    "inspirational": "Вдохновляющий, мотивирующий, позитивный"
 }
 
-# CTA шаблоны по стилям
-CTA_TEMPLATES = {
-    "soft": [
-        "Хотите узнать больше? Пишите в комментариях! 💬",
-        "Интересует? Оставьте сообщение, расскажу подробнее ✨",
-        "Хотите попробовать? Напишите мне в личку 💌"
-    ],
-    "strong": [
-        "Заказывайте прямо сейчас! ⏰",
-        "Не упустите возможность - переходите по ссылке 👆",
-        "Спешите! Количество ограничено 🔥"
-    ],
-    "curious": [
-        "А вы уже пробовали? Делитесь в комментариях 🤔",
-        "Интересно узнать ваше мнение! Пишите 💭",
-        "Хотите узнать секрет? Читайте дальше... 🔎"
-    ]
-}
 
-# Хэштеги
-HASHTAG_TEMPLATES = [
-    "#{product}_продажа", "#{product}_купить", "#товары", "#покупки",
-    "#скидка", "#акция", "#новинка", "#рекомендую", "#качество",
-    "#выгода", "#特惠", "#лучшее", "#выбор", "#промо"
-]
+def get_product_info_from_url(url):
+    """Пытается получить информацию о товаре со страницы"""
+    try:
+        clean_url = url.split('?')[0] if '?' in url else url
+        
+        # Более полная эмуляция браузера
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+        }
+        
+        response = requests.get(clean_url, headers=headers, timeout=15)
+        
+        if response.status_code == 200:
+            text = response.text
+            
+            # Ищем название товара
+            title_match = re.search(r'<title>([^<]+)</title>', text, re.I)
+            if title_match:
+                title = title_match.group(1).split('|')[0].split('-')[0].strip()
+            else:
+                # Пробуем найти в JSON
+                title_match = re.search(r'"name"\s*:\s*"([^"]+)"', text)
+                title = title_match.group(1) if title_match else None
+            
+            # Ищем цену - несколько паттернов
+            price = None
+            for pattern in [r'"price"\s*:\s*(\d+)', r'(\d+[\d\s]*)\s*₽', r'data-price="(\d+)"']:
+                match = re.search(pattern, text)
+                if match:
+                    price = match.group(1).strip()
+                    break
+            
+            # Ищем рейтинг
+            rating_match = re.search(r'"rating"\s*:\s*(\d+\.?\d*)', text)
+            rating = rating_match.group(1) if rating_match else None
+            
+            return {
+                'title': title,
+                'price': price,
+                'rating': rating,
+                'url': clean_url
+            }
+        elif response.status_code == 403:
+            return {'error': 'Доступ запрещён - защита сайта'}
+        elif response.status_code == 404:
+            return {'error': 'Товар не найден'}
+        else:
+            return {'error': f'Ошибка: {response.status_code}'}
+    
+    except requests.exceptions.Timeout:
+        return {'error': 'Время ожидания истекло'}
+    except Exception as e:
+        return {'error': f'Ошибка: {str(e)}'}
 
 
-# ============================================================
-# ФУНКЦИИ ГЕНЕРАЦИИ ПОСТА
-# ============================================================
+def generate_post_with_ai(product_info, tone):
+    """Генерирует пост с помощью языковой модели ProxyAPI"""
+    tone_description = TONES.get(tone, TONES["friendly"])
+    
+    prompt = f"""Ты - профессиональный копирайтер. Создай маркетинговый пост о товаре.
 
-def generate_title(product_name, price_benefit, tone):
-    """Генерирует заголовок поста"""
-    if not product_name:
-        product_name = "Товар"
+Информация о товаре:
+{product_info}
 
-    titles = {
-        "question": [
-            f"А вы уже знаете про {product_name}?",
-            f"Ищете {product_name}? У нас есть!",
-            f"Хотите {product_name} по выгодной цене?"
-        ],
-        "statement": [
-            f"Представляем {product_name}! 🎉",
-            f"Новинка: {product_name} уже в наличии",
-            f"Рекомендуем {product_name}!"
-        ],
-        "benefit": [
-            f"{product_name} - ваша выгода {price_benefit}",
-            f"Получите {price_benefit} с {product_name}",
-            f"Выгода до {price_benefit} с {product_name}"
-        ]
+Стиль поста: {tone_description}
+
+Требования:
+1. Оригинальный текст - НЕ шаблонный
+2. Заголовок с эмодзи
+3. Описание товара и его преимущества
+4. 4-6 хэштегов
+5. CTA - призыв к действию
+
+Если товар с маркетплейса - учти: быстрая доставка, гарантия, возврат.
+
+Пост на русском языке, 100-200 слов."""
+
+    headers = {
+        "Authorization": f"Bearer {PROXY_API_KEY}",
+        "Content-Type": "application/json"
     }
-    return random.choice(titles[TITLE_STYLE])
 
-
-def generate_emoji(tone):
-    """Генерирует эмодзи для поста"""
-    emojis = EMOJI_SETS.get(tone, EMOJI_SETS["friendly"])
-    selected = random.sample(emojis, min(EMOJI_COUNT, len(emojis)))
-    return "".join(selected)
-
-
-def generate_main_text(product_description):
-    """Генерирует основной текст поста"""
-    if not product_description:
-        return ""
-
-    templates = {
-        "short": [
-            f"Отличное решение для вас: {product_description}",
-            f"Идеальный выбор: {product_description}",
-            f"То, что нужно: {product_description}"
-        ],
-        "medium": [
-            f"Хотим рассказать вам о {product_description}. Это то, что сделает вашу жизнь лучше!",
-            f"Представляем вашему вниманию: {product_description}. Проверенное качество!",
-            f"Откройте для себя {product_description}. Отличный выбор для каждого!"
-        ],
-        "long": [
-            f"Мы рады представить вам {product_description}. Этот товар поможет вам решить множество задач и значительно упростит вашу жизнь. Качество проверено временем, а цена приятно удивит!",
-            f"Познакомьтесь с {product_description}. Мы тщательно отобрали этот товар для вас, учитывая все ваши потребности. Отличное соотношение цены и качества, долгий срок службы и полная гарантия!",
-            f"У нас для вас отличная новость! Появился {product_description}. Это именно то, что вы искали - сочетание функциональности, качества и разумной цены. Заказывайте прямо сейчас!"
-        ]
+    data = {
+        "model": MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.9,
+        "max_completion_tokens": 1500
     }
-    return random.choice(templates[POST_LENGTH])
 
+    try:
+        response = requests.post(PROXY_API_URL, headers=headers, json=data, timeout=60)
 
-def generate_benefit(price_benefit):
-    """Генерирует описание выгоды для покупателя"""
-    if not price_benefit:
-        price_benefit = "отличная цена"
+        if response.status_code == 200:
+            result = response.json()
+            post = result["choices"][0]["message"]["content"]
+            return post, None
+        else:
+            error_msg = f"Ошибка API: {response.status_code}"
+            try:
+                error_data = response.json()
+                error_msg += f" - {error_data.get('error', {}).get('message', '')}"
+            except:
+                pass
+            return None, error_msg
+    except requests.exceptions.Timeout:
+        return None, "Время ожидания истекло"
+    except Exception as e:
+        return None, f"Ошибка: {str(e)}"
 
-    benefit_templates = [
-        f"Вы получаете {price_benefit} - это отличная возможность сэкономить!",
-        f"Цена {price_benefit} - такое предложение нельзя упустить!",
-        f"Ваша выгода: {price_benefit}. Спешите сделать заказ!",
-        f"Только сейчас: {price_benefit}. Не упустите шанс!"
-    ]
-    return random.choice(benefit_templates)
-
-
-def generate_hashtags(product_name):
-    """Генерирует хэштеги для поста"""
-    product_clean = product_name.replace(" ", "_") if product_name else "товар"
-
-    available_tags = [tag.format(product=product_clean) for tag in HASHTAG_TEMPLATES]
-    selected_tags = random.sample(available_tags, min(HASHTAG_COUNT, len(available_tags)))
-    return " ".join(selected_tags)
-
-
-def generate_cta():
-    """Генерирует CTA (призыв к действию)"""
-    ctas = CTA_TEMPLATES.get(CTA_STYLE, CTA_TEMPLATES["soft"])
-    return random.choice(ctas)
-
-
-def generate_post(product_name, product_description, price_benefit, tone):
-    """Генерирует готовый пост"""
-    # Собираем все части поста
-    title = generate_title(product_name, price_benefit, tone)
-    emoji = generate_emoji(tone)
-    main_text = generate_main_text(product_description)
-    benefit = generate_benefit(price_benefit)
-    hashtags = generate_hashtags(product_name)
-    cta = generate_cta()
-
-    # Формируем итоговый пост
-    post_parts = [
-        f"{title} {emoji}",
-        "",
-        main_text,
-        "",
-        benefit,
-        "",
-        cta,
-        "",
-        hashtags
-    ]
-
-    return "\n".join(post_parts)
-
-
-# ============================================================
-# МАРШРУТЫ ПРИЛОЖЕНИЯ
-# ============================================================
 
 @app.route('/')
 def index():
-    """Главная страница"""
-    return render_template('index.html')
+    return render_template('index.html', tones=TONES)
 
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    """Обработка генерации поста"""
     data = request.get_json()
 
-    # Получаем данные из формы
-    product_name = data.get('product_name', '').strip()
+    product_url = data.get('product_url', '').strip()
     product_description = data.get('product_description', '').strip()
-    price_benefit = data.get('price_benefit', '').strip()
     tone = data.get('tone', 'friendly')
 
-    # Валидация - описание товара обязательно
-    if not product_description:
+    # Обязательно ссылка
+    if not product_url:
         return jsonify({
             'success': False,
-            'error': 'Добавьте описание товара'
+            'error': 'Добавьте ссылку на товар'
         })
 
-    # Генерируем пост
-    post = generate_post(product_name, product_description, price_benefit, tone)
+    # Добавляем https если нужно
+    if not product_url.startswith(('http://', 'https://')):
+        product_url = 'https://' + product_url
 
-    return jsonify({
-        'success': True,
-        'post': post
-    })
+    # Пробуем получить данные со страницы
+    info = get_product_info_from_url(product_url)
+    
+    # Если не получилось и есть описание - используем его
+    if info and 'error' in info:
+        if not product_description:
+            return jsonify({
+                'success': False,
+                'error': 'Не удалось прочитать ссылку. Добавьте описание товара вручную.'
+            })
+        # Используем описание вместо ссылки
+        product_info = f"Ссылка: {product_url.split('?')[0]}\nОписание: {product_description}\n"
+    elif info:
+        # Успешно получили данные
+        product_info = ""
+        if info.get('title'):
+            product_info += f"Название: {info['title']}\n"
+        if info.get('price'):
+            product_info += f"Цена: {info['price']} ₽\n"
+        if info.get('rating'):
+            product_info += f"Рейтинг: {info['rating']}/5\n"
+        # Дополняем описанием если есть
+        if product_description:
+            product_info += f"Доп. описание: {product_description}\n"
+    else:
+        # Нет данных - используем описание или URL
+        if product_description:
+            product_info = f"Описание: {product_description}\n"
+        else:
+            product_info = f"Ссылка на товар: {product_url}\n"
+
+    # Генерируем пост
+    post, error = generate_post_with_ai(product_info, tone)
+
+    if error:
+        return jsonify({'success': False, 'error': error})
+
+    return jsonify({'success': True, 'post': post})
 
 
 if __name__ == '__main__':
-    # Запуск приложения
-    # host='0.0.0.0' - доступ с других устройств в сети
-    # port=5000 - порт по умолчанию для Flask
-    # debug=True - режим отладки (только для разработки!)
-    app.run(host='127.0.0.1', port=5001, debug=True)
+    app.run(host='192.168.1.14', port=5002, debug=False)
