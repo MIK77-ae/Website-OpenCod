@@ -1,0 +1,24 @@
+"""
+config.py — Конфигурация проекта (ШАБЛОН)
+========================================
+Скопируйте этот файл в config.py и вставьте свой API-ключ.
+
+ИЛИ установите переменную окружения:
+  Windows: set PROXY_API_KEY=ваш-ключ
+  Linux/Mac: export PROXY_API_KEY=ваш-ключ
+"""
+
+# Ваш API-ключ ProxyAPI (скопируйте с сайта https://proxyapi.ru/keys)
+PROXY_API_KEY = "ВСТАВЬТЕ_ВАШ_КЛЮЧ_СЮДА"
+
+# Базовый URL
+PROXY_API_BASE_URL = "https://api.proxyapi.ru"
+
+# Модель (gpt-5.4-mini рекомендуется)
+MODEL_NAME = "gpt-5.4-mini"
+
+# Параметры генерации
+MAX_TOKENS = 800
+MAX_TOKENS_PARAM = "max_completion_tokens"
+TEMPERATURE = 0.9
+API_TIMEOUT = 60

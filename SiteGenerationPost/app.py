@@ -2,9 +2,14 @@
 Генератор постов для товаров на Flask с ProxyAPI
 """
 
+import os
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify
 import requests
 import re
+
+# Загружаем переменные из .env файла
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -12,7 +17,11 @@ app = Flask(__name__)
 # НАСТРОЙКИ PROXYAPI
 # ============================================================
 
-PROXY_API_KEY = "sk-Wn6aMngfsrbCRtoN30ILHSfNFLVJR1mp"
+# Ключ из переменной окружения
+PROXY_API_KEY = os.environ.get('PROXY_API_KEY', '')
+if not PROXY_API_KEY:
+    raise ValueError("Необходимо указать PROXY_API_KEY в .env файле!")
+
 PROXY_API_URL = "https://api.proxyapi.ru/openai/v1/chat/completions"
 MODEL = "gpt-5.4-mini"
 
