@@ -17,11 +17,7 @@
             --error-color: #EF4444;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -34,26 +30,11 @@
             padding: 20px;
         }
 
-        .container {
-            max-width: 600px;
-            width: 100%;
-        }
+        .container { max-width: 600px; width: 100%; }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            color: var(--text-color);
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: var(--text-secondary);
-            font-size: 16px;
-        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { color: var(--text-secondary); font-size: 16px; }
 
         .card {
             background: var(--card-bg);
@@ -63,50 +44,20 @@
             margin-bottom: 20px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 8px; }
+        .form-group .required { color: var(--error-color); }
 
-        .form-group label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text-color);
-        }
-
-        .form-group .required {
-            color: var(--error-color);
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid var(--border-color);
             border-radius: 10px;
             font-size: 16px;
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .form-group .hint {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 6px;
-        }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .form-group .hint { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
 
         .btn-generate {
             width: 100%;
@@ -118,21 +69,10 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
         }
 
-        .btn-generate:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-generate:active {
-            transform: scale(0.98);
-        }
-
-        .btn-generate:disabled {
-            background-color: #9CA3AF;
-            cursor: not-allowed;
-        }
+        .btn-generate:hover { background-color: var(--primary-hover); }
+        .btn-generate:disabled { background-color: #9CA3AF; cursor: not-allowed; }
 
         .error-message {
             background-color: #FEF2F2;
@@ -142,10 +82,7 @@
             margin-bottom: 20px;
             display: none;
         }
-
-        .error-message.show {
-            display: block;
-        }
+        .error-message.show { display: block; }
 
         .result-card {
             background: var(--card-bg);
@@ -154,22 +91,9 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             display: none;
         }
+        .result-card.show { display: block; }
 
-        .result-card.show {
-            display: block;
-        }
-
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-.result-header h2 {
-            font-size: 20px;
-            color: var(--text-color);
-        }
+        .result-header h2 { font-size: 20px; margin-bottom: 16px; }
 
         .link-status {
             font-size: 13px;
@@ -178,18 +102,8 @@
             margin-bottom: 12px;
             display: none;
         }
-
-        .link-status.success {
-            display: block;
-            background-color: #D1FAE5;
-            color: #065F46;
-        }
-
-        .link-status.warning {
-            display: block;
-            background-color: #FEF3C7;
-            color: #92400E;
-        }
+        .link-status.success { display: block; background-color: #D1FAE5; color: #065F46; }
+        .link-status.warning { display: block; background-color: #FEF3C7; color: #92400E; }
 
         .post-content {
             background-color: #F3F4F6;
@@ -198,7 +112,6 @@
             white-space: pre-wrap;
             font-size: 15px;
             line-height: 1.7;
-            color: var(--text-color);
             margin-bottom: 16px;
         }
 
@@ -212,17 +125,7 @@
             border: none;
             border-radius: 10px;
             font-size: 15px;
-            font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-        }
-
-        .btn-copy:hover {
-            background-color: #059669;
-        }
-
-        .btn-copy:active {
-            transform: scale(0.98);
         }
 
         .copy-message {
@@ -231,19 +134,7 @@
             font-weight: 500;
             margin-left: 12px;
         }
-
-        .copy-message.error {
-            color: var(--error-color);
-        }
-
-        .copy-message.show {
-            display: inline;
-        }
-
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
+        .copy-message.show { display: inline; }
 
         .spinner {
             display: inline-block;
@@ -257,9 +148,7 @@
             vertical-align: middle;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -279,7 +168,7 @@
 
             <div class="form-group">
                 <label for="productDescription">Описание товара <span class="required">*</span></label>
-                <textarea id="productDescription" rows="4" placeholder="Например: iPhone 15 Pro 512GB, синий, Apple A17 Pro"></textarea>
+                <textarea id="productDescription" rows="4" placeholder="Например: iPhone 15 Pro 512GB, синий"></textarea>
                 <div class="hint">Обязательно - опишите товар или вставьте ссылку выше</div>
             </div>
 
@@ -304,9 +193,7 @@
                 </select>
             </div>
 
-            <button class="btn-generate" id="generateBtn">
-                Создать пост с ИИ
-            </button>
+            <button class="btn-generate" id="generateBtn">Создать пост с ИИ</button>
         </div>
 
         <div class="result-card" id="resultCard">
@@ -315,9 +202,7 @@
             </div>
             <div class="link-status" id="linkStatus"></div>
             <div class="post-content" id="postContent"></div>
-            <button class="btn-copy" id="copyBtn">
-                📋 Скопировать пост
-            </button>
+            <button class="btn-copy" id="copyBtn">📋 Скопировать пост</button>
             <span class="copy-message" id="copyMessage">Пост скопирован!</span>
         </div>
     </div>
@@ -331,8 +216,7 @@
         const errorMessage = document.getElementById('errorMessage');
         const linkStatus = document.getElementById('linkStatus');
 
-async function generatePost() {
-            console.log('Начало генерации...');
+        async function generatePost() {
             generateBtn.disabled = true;
             generateBtn.innerHTML = '<span class="spinner"></span> Генерация...';
 
@@ -343,10 +227,8 @@ async function generatePost() {
             const productDescription = document.getElementById('productDescription').value;
             const tone = document.getElementById('tone').value;
 
-            console.log('URL:', productUrl, 'Description:', productDescription, 'Tone:', tone);
-
-            if (!productUrl && !productDescription) {
-                errorMessage.textContent = 'Добавьте ссылку или описание товара';
+            if (!productDescription) {
+                errorMessage.textContent = 'Добавьте описание товара';
                 errorMessage.classList.add('show');
                 generateBtn.disabled = false;
                 generateBtn.textContent = 'Создать пост с ИИ';
@@ -354,12 +236,9 @@ async function generatePost() {
             }
 
             try {
-                console.log('Отправка запроса...');
                 const response = await fetch('/generate', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         product_url: productUrl,
                         product_description: productDescription,
@@ -367,9 +246,7 @@ async function generatePost() {
                     })
                 });
 
-                console.log('Ответ получен:', response.status);
                 const data = await response.json();
-                console.log('Данные:', data);
 
                 if (data.success) {
                     postContent.textContent = data.post;
@@ -384,60 +261,12 @@ async function generatePost() {
                         linkStatus.classList.add('warning');
                     }
                 } else {
-                    console.log('Ошибка:', data.error);
                     errorMessage.textContent = data.error || 'Ошибка генерации';
                     errorMessage.classList.add('show');
                 }
 
             } catch (error) {
-                console.log('Exception:', error);
                 errorMessage.textContent = 'Ошибка: ' + error.message;
-                errorMessage.classList.add('show');
-            }
-
-            generateBtn.disabled = false;
-            generateBtn.textContent = 'Создать пост с ИИ';
-        }
-
-            try {
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        product_url: productUrl,
-                        product_description: productDescription,
-                        tone: tone
-                    })
-                });
-
-                const data = await response.json();
-
-if (data.success) {
-                    postContent.textContent = data.post;
-                    resultCard.classList.add('show');
-                    
-                    // Показываем статус ссылки
-                    linkStatus.className = 'link-status';
-                    if (data.link_read) {
-                        linkStatus.textContent = '✅ Ссылка считана!';
-                        linkStatus.classList.add('success');
-                    } else {
-                        linkStatus.textContent = '⚠️ Использовано описание';
-                        linkStatus.classList.add('warning');
-                    }
-                } else {
-                        linkStatus.classList.add('error');
-                        linkStatus.textContent = '⚠️ Ссылка не считана. Использовано описание.';
-                    }
-                } else {
-                    errorMessage.textContent = data.error;
-                    errorMessage.classList.add('show');
-                }
-
-            } catch (error) {
-                errorMessage.textContent = 'Ошибка: ' + error.message + '. Попробуйте ещё раз.';
                 errorMessage.classList.add('show');
             }
 
@@ -447,47 +276,14 @@ if (data.success) {
 
         function copyPost() {
             const text = postContent.textContent;
-            
-            // Пробуем использовать clipboard API
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(() => {
-                    copyMessage.textContent = 'Пост скопирован!';
-                    copyMessage.classList.add('show');
-                    setTimeout(() => {
-                        copyMessage.classList.remove('show');
-                    }, 2000);
-                }).catch(err => {
-                    // Fallback для старых браузеров
-                    copyToClipboardFallback(text);
-                });
-            } else {
-                // Fallback
-                copyToClipboardFallback(text);
-            }
-        }
-        
-        function copyToClipboardFallback(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                copyMessage.textContent = 'Пост скопирован!';
+            navigator.clipboard.writeText(text).then(() => {
                 copyMessage.classList.add('show');
-                setTimeout(() => {
-                    copyMessage.classList.remove('show');
-                }, 2000);
-            } catch (err) {
-                copyMessage.textContent = 'Не удалось скопировать';
+                setTimeout(() => copyMessage.classList.remove('show'), 2000);
+            }).catch(() => {
+                copyMessage.textContent = 'Не скопировалось';
                 copyMessage.classList.add('show');
-                setTimeout(() => {
-                    copyMessage.classList.remove('show');
-                }, 2000);
-            }
-            document.body.removeChild(textarea);
+                setTimeout(() => copyMessage.classList.remove('show'), 2000);
+            });
         }
 
         generateBtn.addEventListener('click', generatePost);
