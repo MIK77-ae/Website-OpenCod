@@ -9,7 +9,11 @@ import os
 # =============================================================================
 # PROXY API (для генерации постов)
 # =============================================================================
-PROXY_API_KEY = os.environ.get("PROXY_API_KEY", "sk-Wn6aMngfsrbCRtoN30ILHSfNFLVJR1mp")
+# Ключ хранится в переменной окружения для безопасности
+# Windows: set PROXY_API_KEY=ваш-ключ
+# Linux/Mac: export PROXY_API_KEY=ваш-ключ
+
+PROXY_API_KEY = os.environ.get("PROXY_API_KEY", "")
 PROXY_API_BASE_URL = "https://api.proxyapi.ru"
 MODEL_NAME = "gpt-5.4-mini"
 MAX_TOKENS = 800
@@ -20,14 +24,14 @@ API_TIMEOUT = 60
 # =============================================================================
 # VKONTAKTE API (для публикации постов)
 # =============================================================================
-# Получить токен: https://vk.com/edit.php?act=settings&section=api
-# Подробная инструкция в README.md
+# Токен и ID хранятся в переменных окружения для безопасности
+# Windows: set VK_ACCESS_TOKEN=ваш-токен && set VK_GROUP_ID=123456789
+# Linux/Mac: export VK_ACCESS_TOKEN=ваш-токен && export VK_GROUP_ID=123456789
 
-# Токен доступа ВК (от сообщества)
+# Токен доступа ВК (из переменной окружения)
 VK_ACCESS_TOKEN = os.environ.get("VK_ACCESS_TOKEN", "")
 
-# ID сообщества (можно посмотреть в ссылке сообщества)
-# Например, для https://vk.com/club123456789 -> ID = 123456789
+# ID сообщества (из переменной окружения)
 VK_GROUP_ID = os.environ.get("VK_GROUP_ID", "")
 
 # =============================================================================
