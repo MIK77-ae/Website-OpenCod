@@ -22,6 +22,9 @@ config.py
 .env*
 VK_ACCESS_TOKEN*
 VK_GROUP_ID*
+PROXY_API_KEY*
+run.bat
+run.bat.example
 
 # JSON data files
 favorites.json
