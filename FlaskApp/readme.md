@@ -33,12 +33,12 @@ Flask/
 ## Запуск
 
 ```bash
-cd Flask
+cd FlaskApp
 pip install -r requirements.txt
 python app.py
 ```
 
-Открой в браузере: http://127.0.0.1:5001
+Открой в браузере: http://localhost:8000
 
 ## Темы карточек
 
