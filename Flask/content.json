@@ -29,10 +29,10 @@
       "color": "yellow"
     },
     {
-      "title": "Cloud Code: разработка в браузере",
-      "description": "Забудь об установке IDE. Пиши код прямо в браузере с GitHub Codespaces или Replit.",
-      "link": "https://ru.wikipedia.org/wiki/Облачные_вычисления",
-      "tags": ["cloud code", "инструменты"],
+      "title": "Вайб-кодинг: инструменты и подходы",
+      "description": "Узнай про инструменты вайб-кодинга: Cursor, Claude Code, Lovable, Bubble и другие. Как писать код через AI без IDE.",
+      "link": "https://habr.com/ru/companies/datafeel/articles/902982/",
+      "tags": ["cloud code", "инструменты", "вайбкодинг"],
       "color": "cyan"
     },
     {
