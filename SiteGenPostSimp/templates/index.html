@@ -7,216 +7,498 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <!-- ==================== ШАПКА САЙТА ==================== -->
     <header class="header">
         <div class="container">
-            <h1>🎯 Генератор постов</h1>
-            <p>Создавайте уникальные посты для ваших товаров с помощью ИИ</p>
+            <h1>Генератор постов</h1>
+            <p>Создавайте уникальные посты с помощью ИИ</p>
         </div>
     </header>
 
-    <!-- ==================== ОСНОВНОЙ КОНТЕНТ ==================== -->
     <main class="container">
-        <div class="form-card">
-            <!-- ================ ФОРМА ВВОДА ================ -->
-            <form id="postForm">
-                <!-- Поле: Название товара -->
-                <div class="form-group">
-                    <label for="product">Название товара</label>
-                    <input type="text" 
-                           id="product" 
-                           name="product" 
-                           placeholder="Например: Умная лампочка">
-                </div>
-
-                <!-- Поле: Описание товара (обязательное) -->
-                <div class="form-group">
-                    <label for="description">
-                        Описание товара <span class="required">*</span>
-                    </label>
-                    <textarea id="description" 
-                              name="description" 
-                              rows="4" 
-                              placeholder="Опишите товар: характеристики, особенности, преимущества..."
-                              required></textarea>
-                </div>
-
-                <!-- Поле: Цена или выгода -->
-                <div class="form-group">
-                    <label for="price_info">Цена или выгода</label>
-                    <input type="text" 
-                           id="price_info" 
-                           name="price_info" 
-                           placeholder="Например: 1990 ₽ или Скидка 20%">
-                </div>
-
-                <!-- Поле: Выбор тона текста -->
-                <div class="form-group">
-                    <label>Тон текста</label>
-                    <div class="mood-selector">
-                        {% for key, mood in moods.items() %}
-                        <label class="mood-option">
-                            <input type="radio" 
-                                   name="mood" 
-                                   value="{{ key }}" 
-                                   {% if loop.first %}checked{% endif %}>
-                            <span class="mood-label">
-                                <span class="mood-icon">{{ loop.index }}</span>
-                                {{ mood.description }}
-                            </span>
-                        </label>
-                        {% endfor %}
-                    </div>
-                    <div class="mood-hint">
-                        <small>1 — Дружелюбный | 2 — Восторженный | 3 — Деловой | 4 — Спокойный</small>
-                    </div>
-                </div>
-
-                <!-- Кнопка: Сформировать пост -->
-                <button type="submit" class="btn-generate">
-                    ✨ Сформировать пост
-                </button>
-            </form>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="generator">Генератор</button>
+            <button class="tab-btn" data-tab="favorites">Избранное</button>
+            <button class="tab-btn" data-tab="scheduled">Отложенные</button>
         </div>
 
-        <!-- ================ БЛОК С ГОТОВЫМ ПОСТОМ ================ -->
-        <div class="result-card" id="resultCard">
-            <h2>📝 Готовый пост</h2>
-            <div class="result-content" id="resultContent">
-                <p class="placeholder-text">
-                    Заполните форму и нажмите «Сформировать пост»
-                </p>
-            </div>
-            
-            <!-- Кнопка: Скопировать пост -->
-            <button type="button" 
-                    class="btn-copy" 
-                    id="copyBtn" 
-                    style="display: none;"
-                    onclick="copyPost()">
-                📋 Скопировать пост
-            </button>
+        <!-- Вкладка: Генератор -->
+        <div class="tab-content active" id="tab-generator">
+            <div class="form-card">
+                <form id="postForm">
+                    <div class="form-group">
+                        <label for="product">Название товара</label>
+                        <input type="text" id="product" name="product" placeholder="Например: Умная лампочка">
+                    </div>
 
-            <!-- Сообщение после копирования -->
-            <div class="copy-message" id="copyMessage" style="display: none;">
-                ✅ Пост скопирован
+                    <div class="form-group">
+                        <label for="description">Описание товара <span class="required">*</span></label>
+                        <textarea id="description" name="description" rows="4" 
+                            placeholder="Опишите товар: характеристики, особенности, преимущества..."
+                            required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price_info">Цена или выгода</label>
+                        <input type="text" id="price_info" name="price_info" 
+                            placeholder="Например: 1990 руб или Скидка 20%">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Тон текста</label>
+                        <div class="mood-selector">
+                            {% for key, mood in moods.items() %}
+                            <label class="mood-option">
+                                <input type="radio" name="mood" value="{{ key }}" {% if loop.first %}checked{% endif %}>
+                                <span class="mood-label">
+                                    <span class="mood-icon">{{ loop.index }}</span>
+                                    {{ mood.description }}
+                                </span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-generate">
+                        Сформировать пост
+                    </button>
+                </form>
+            </div>
+
+            <!-- Готовый пост -->
+            <div class="result-card" id="resultCard">
+                <h2>Готовый пост</h2>
+                <div class="result-content" id="resultContent">
+                    <p class="placeholder-text">Заполните форму и нажмите "Сформировать пост"</p>
+                </div>
+                
+                <!-- Кнопки действий под постом -->
+                <div class="action-buttons" id="actionButtons" style="display: none;">
+                    <button type="button" class="btn-action btn-copy" id="copyBtn" onclick="copyPost()">
+                        Скопировать пост
+                    </button>
+                    <button type="button" class="btn-action btn-favorite" id="favoriteBtn" onclick="toggleFavorite()">
+                        В избранное
+                    </button>
+                </div>
+
+                <!-- Блок публикации ВК -->
+                <div class="vk-publish-block" id="vkPublishBlock" style="display: none;">
+                    <div class="vk-divider"></div>
+                    <h3>Публикация во ВКонтакте</h3>
+                    
+                    <div class="vk-status" id="vkStatus"></div>
+                    
+                    <!-- Публикация сейчас -->
+                    <div class="publish-now-row">
+                        <button type="button" class="btn-vk-now" id="publishNowBtn" onclick="publishNow()">
+                            Опубликовать сейчас
+                        </button>
+                    </div>
+                    
+                    <!-- Отложенная публикация -->
+                    <div class="schedule-row">
+                        <label for="schedule_date">Запланировать на:</label>
+                        <input type="datetime-local" id="schedule_date" name="schedule_date">
+                        <button type="button" class="btn-schedule" onclick="schedulePost()">
+                            Запланировать
+                        </button>
+                    </div>
+                    
+                    <!-- Сообщение о результате -->
+                    <div class="publish-message" id="publishMessage" style="display: none;"></div>
+                </div>
+
+                <!-- Сообщение о копировании -->
+                <div class="copy-message" id="copyMessage" style="display: none;">
+                    Пост скопирован
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка: Избранное -->
+        <div class="tab-content" id="tab-favorites">
+            <div class="favorites-card">
+                <div class="card-header">
+                    <h2>Избранные посты</h2>
+                    <button class="btn-refresh" onclick="loadFavorites()">Обновить</button>
+                </div>
+                <div class="favorites-list" id="favoritesList">
+                    <p class="placeholder-text">Тут появятся сохранённые посты</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка: Отложенные -->
+        <div class="tab-content" id="tab-scheduled">
+            <div class="scheduled-card">
+                <div class="card-header">
+                    <h2>Запланированные посты</h2>
+                    <button class="btn-refresh" onclick="loadScheduled()">Обновить</button>
+                </div>
+                <div class="scheduled-list" id="scheduledList">
+                    <p class="placeholder-text">Тут появятся запланированные посты</p>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- ==================== ПОДВАЛ ==================== -->
     <footer class="footer">
-        <p>Генератор постов — powered by ProxyAPI</p>
+        <p>Генератор постов - powered by ProxyAPI</p>
     </footer>
 
-    <!-- ==================== JAVASCRIPT ==================== -->
     <script>
-        // -----------------------------------------------------------------
-        // ОБРАБОТЧИК ФОРМЫ
-        // -----------------------------------------------------------------
-        document.getElementById('postForm').addEventListener('submit', async function(e) {
-            // Отменяем стандартную отправку формы
-            e.preventDefault();
+        let currentPost = '';
+        let isFavorite = false;
+        let currentFavoriteId = null;
 
+        document.addEventListener('DOMContentLoaded', function() {
+            initTabs();
+            checkVKStatus();
+            loadFavorites();
+            loadScheduled();
+        });
+
+        function initTabs() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                });
+            });
+        }
+
+        document.getElementById('postForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
             const formData = new FormData(this);
             const submitBtn = document.querySelector('.btn-generate');
-
-            // Показываем состояние загрузки
+            
             submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Генерация...';
-
+            submitBtn.textContent = 'Генерация...';
+            
             try {
-                // Отправляем данные на сервер
                 const response = await fetch('/generate', {
                     method: 'POST',
                     body: formData
                 });
-
+                
                 const data = await response.json();
-
+                
                 if (data.success) {
-                    // Показываем готовый пост
                     showResult(data.post);
                 } else {
-                    // Показываем ошибку
                     showError(data.error);
                 }
             } catch (error) {
-                showError('Что-то пошло не так. Попробуйте ещё раз.');
+                showError('Что-то пошло не так');
             } finally {
-                // Возвращаем кнопку в нормальное состояние
                 submitBtn.disabled = false;
-                submitBtn.textContent = '✨ Сформировать пост';
+                submitBtn.textContent = 'Сформировать пост';
             }
         });
 
-        /**
-         * Показывает готовый пост
-         * @param {string} postText - текст поста
-         */
         function showResult(postText) {
-            const resultContent = document.getElementById('resultContent');
-            const copyBtn = document.getElementById('copyBtn');
-            const copyMessage = document.getElementById('copyMessage');
-
-            // Преобразуем текст в HTML для переносов строк
-            resultContent.innerHTML = formatPost(postText);
+            currentPost = postText;
+            isFavorite = false;
+            currentFavoriteId = null;
             
-            // Показываем кнопку копирования
-            copyBtn.style.display = 'inline-block';
-            copyBtn.dataset.post = postText;
-
-            // Скрываем сообщение о копировании
-            copyMessage.style.display = 'none';
+            document.getElementById('resultContent').innerHTML = postText.replace(/\n/g, '<br>');
+            document.getElementById('actionButtons').style.display = 'flex';
+            document.getElementById('vkPublishBlock').style.display = 'block';
+            document.getElementById('publishMessage').style.display = 'none';
+            
+            const favoriteBtn = document.getElementById('favoriteBtn');
+            favoriteBtn.textContent = 'В избранное';
+            favoriteBtn.classList.remove('active');
         }
 
-        /**
-         * Показывает сообщение об ошибке
-         * @param {string} errorText - текст ошибки
-         */
         function showError(errorText) {
-            const resultContent = document.getElementById('resultContent');
-            const copyBtn = document.getElementById('copyBtn');
-
-            resultContent.innerHTML = `<p class="error-text">⚠️ ${errorText}</p>`;
-            copyBtn.style.display = 'none';
+            document.getElementById('resultContent').innerHTML = 
+                '<p class="error-text">' + errorText + '</p>';
+            document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById('vkPublishBlock').style.display = 'none';
         }
 
-        /**
-         * Форматирует текст поста для отображения
-         * @param {string} text - исходный текст
-         * @returns {string} HTML с переносами строк
-         */
-        function formatPost(text) {
-            // Заменяем переносы строк на теги <br>
-            return text.replace(/\n/g, '<br>');
-        }
-
-        /**
-         * Копирует пост в буфер обмена
-         */
         async function copyPost() {
-            const copyBtn = document.getElementById('copyBtn');
-            const copyMessage = document.getElementById('copyMessage');
-            const postText = copyBtn.dataset.post;
-
             try {
-                // Копируем текст в буфер обмена
-                await navigator.clipboard.writeText(postText);
-
-                // Показываем сообщение об успехе
-                copyMessage.style.display = 'block';
-                copyBtn.textContent = '✅ Скопировано!';
-
-                // Скрываем сообщение через 3 секунды
+                await navigator.clipboard.writeText(currentPost);
+                document.getElementById('copyMessage').style.display = 'block';
+                const copyBtn = document.getElementById('copyBtn');
+                copyBtn.textContent = 'Скопировано!';
+                
                 setTimeout(() => {
-                    copyMessage.style.display = 'none';
-                    copyBtn.textContent = '📋 Скопировать пост';
+                    document.getElementById('copyMessage').style.display = 'none';
+                    copyBtn.textContent = 'Скопировать пост';
                 }, 3000);
-
             } catch (error) {
-                // Если буфер обмена недоступен
-                alert('Не удалось скопировать. Выделите текст и скопируйте вручную.');
+                alert('Не удалось скопировать');
+            }
+        }
+
+        async function toggleFavorite() {
+            const favoriteBtn = document.getElementById('favoriteBtn');
+            
+            if (isFavorite && currentFavoriteId) {
+                try {
+                    const response = await fetch('/favorites/' + currentFavoriteId, {
+                        method: 'DELETE'
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        isFavorite = false;
+                        currentFavoriteId = null;
+                        favoriteBtn.textContent = 'В избранное';
+                        favoriteBtn.classList.remove('active');
+                        loadFavorites();
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                }
+            } else {
+                try {
+                    const response = await fetch('/favorites/add', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            post_text: currentPost,
+                            product: document.getElementById('product').value,
+                            tone: document.querySelector('input[name="mood"]:checked').value
+                        })
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        isFavorite = true;
+                        currentFavoriteId = data.post.id;
+                        favoriteBtn.textContent = 'В избранном';
+                        favoriteBtn.classList.add('active');
+                        loadFavorites();
+                    } else {
+                        alert('Ошибка: ' + data.error);
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Не удалось добавить в избранное');
+                }
+            }
+        }
+
+        async function loadFavorites() {
+            try {
+                const response = await fetch('/favorites');
+                const data = await response.json();
+                const list = document.getElementById('favoritesList');
+                
+                if (data.favorites && data.favorites.length > 0) {
+                    let html = '';
+                    data.favorites.forEach(function(post) {
+                        html += '<div class="favorite-item">';
+                        html += '<div class="favorite-header">';
+                        html += '<strong>' + (post.product || 'Без названия') + '</strong>';
+                        html += '<span class="favorite-date">' + post.created_at + '</span>';
+                        html += '</div>';
+                        html += '<div class="favorite-text">' + post.text.substring(0, 150) + (post.text.length > 150 ? '...' : '') + '</div>';
+                        html += '<div class="favorite-actions">';
+                        html += '<button class="btn-small" onclick="useFavorite(' + post.id + ')">Использовать</button>';
+                        html += '<button class="btn-small btn-delete" onclick="deleteFavorite(' + post.id + ')">Удалить</button>';
+                        html += '</div></div>';
+                    });
+                    list.innerHTML = html;
+                } else {
+                    list.innerHTML = '<p class="placeholder-text">Пока нет избранных постов</p>';
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        async function useFavorite(postId) {
+            try {
+                const response = await fetch('/favorites/' + postId);
+                const post = await response.json();
+                
+                if (post && post.text) {
+                    currentPost = post.text;
+                    currentFavoriteId = postId;
+                    isFavorite = true;
+                    
+                    document.getElementById('resultContent').innerHTML = post.text.replace(/\n/g, '<br>');
+                    document.getElementById('actionButtons').style.display = 'flex';
+                    document.getElementById('vkPublishBlock').style.display = 'block';
+                    
+                    const favoriteBtn = document.getElementById('favoriteBtn');
+                    favoriteBtn.textContent = 'В избранном';
+                    favoriteBtn.classList.add('active');
+                    
+                    document.querySelector('[data-tab="generator"]').click();
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        async function deleteFavorite(postId) {
+            if (!confirm('Удалить этот пост из избранного?')) return;
+            
+            try {
+                const response = await fetch('/favorites/' + postId, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (currentFavoriteId == postId) {
+                        isFavorite = false;
+                        currentFavoriteId = null;
+                    }
+                    loadFavorites();
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        async function checkVKStatus() {
+            try {
+                const response = await fetch('/vk/status');
+                const data = await response.json();
+                const statusDiv = document.getElementById('vkStatus');
+                
+                if (data.configured) {
+                    statusDiv.innerHTML = '<span class="vk-connected">ВК подключен: ' + data.group_name + '</span>';
+                } else {
+                    statusDiv.innerHTML = '<span class="vk-not-connected">ВК не настроен</span>';
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        async function publishNow() {
+            const publishBtn = document.getElementById('publishNowBtn');
+            publishBtn.disabled = true;
+            publishBtn.textContent = 'Публикация...';
+            
+            try {
+                const response = await fetch('/vk/publish', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({post_text: currentPost})
+                });
+                
+                const data = await response.json();
+                showPublishMessage(data);
+            } catch (error) {
+                showPublishMessage({success: false, error: 'Ошибка соединения'});
+            } finally {
+                publishBtn.disabled = false;
+                publishBtn.textContent = 'Опубликовать сейчас';
+            }
+        }
+
+        async function schedulePost() {
+            const scheduleDate = document.getElementById('schedule_date').value;
+            const scheduleBtn = document.querySelector('.btn-schedule');
+            
+            if (!scheduleDate) {
+                showPublishMessage({success: false, error: 'Укажите дату и время'});
+                return;
+            }
+            
+            scheduleBtn.disabled = true;
+            scheduleBtn.textContent = 'Планирование...';
+            
+            try {
+                const response = await fetch('/vk/schedule', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        post_text: currentPost,
+                        schedule_time: scheduleDate
+                    })
+                });
+                
+                const data = await response.json();
+                showPublishMessage(data);
+                
+                if (data.success) {
+                    loadScheduled();
+                    document.getElementById('schedule_date').value = '';
+                }
+            } catch (error) {
+                showPublishMessage({success: false, error: 'Ошибка соединения'});
+            } finally {
+                scheduleBtn.disabled = false;
+                scheduleBtn.textContent = 'Запланировать';
+            }
+        }
+
+        function showPublishMessage(data) {
+            const msgDiv = document.getElementById('publishMessage');
+            msgDiv.style.display = 'block';
+            
+            if (data.success) {
+                msgDiv.className = 'publish-message success';
+                msgDiv.textContent = data.message;
+            } else {
+                msgDiv.className = 'publish-message error';
+                msgDiv.textContent = 'Ошибка: ' + data.error;
+            }
+            
+            setTimeout(() => {
+                msgDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        async function loadScheduled() {
+            try {
+                const response = await fetch('/scheduled');
+                const data = await response.json();
+                const list = document.getElementById('scheduledList');
+                
+                if (data.scheduled && data.scheduled.length > 0) {
+                    let html = '';
+                    data.scheduled.forEach(function(post) {
+                        html += '<div class="scheduled-item">';
+                        html += '<div class="scheduled-header">';
+                        html += '<strong>' + (post.product || 'Без названия') + '</strong>';
+                        html += '<span class="scheduled-time">' + post.schedule_time + '</span>';
+                        html += '</div>';
+                        html += '<div class="scheduled-text">' + post.text.substring(0, 150) + (post.text.length > 150 ? '...' : '') + '</div>';
+                        html += '<div class="scheduled-actions">';
+                        html += '<button class="btn-small btn-delete" onclick="deleteScheduled(' + post.id + ')">Удалить</button>';
+                        html += '</div></div>';
+                    });
+                    list.innerHTML = html;
+                } else {
+                    list.innerHTML = '<p class="placeholder-text">Пока нет запланированных постов</p>';
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        async function deleteScheduled(postId) {
+            if (!confirm('Удалить этот запланированный пост?')) return;
+            
+            try {
+                const response = await fetch('/scheduled/' + postId, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadScheduled();
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
             }
         }
     </script>

@@ -6,7 +6,6 @@ __pycache__/
 .Python
 venv/
 env/
-.env
 
 # IDE
 .vscode/
@@ -17,9 +16,13 @@ env/
 # Logs
 *.log
 
-# API keys and secrets - NEVER commit
+# API keys and secrets
 config.py
 *.env
 .env*
-credentials.py
-secrets.py
+VK_ACCESS_TOKEN*
+VK_GROUP_ID*
+
+# JSON data files
+favorites.json
+scheduled_posts.json
