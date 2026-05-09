@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор постов для товаров</title>
+    <style>
+        /* ============================================================
+           ПРОСТЫЕ СТИЛИ - легко изменить цвета и шрифты
+           ============================================================ */
+
+        /* Основные цвета - измените здесь */
+        :root {
+            --primary-color: #4F46E5;      /* Основной цвет кнопок */
+            --primary-hover: #4338CA;       /* Цвет при наведении */
+            --bg-color: #F9FAFB;           /* Фон страницы */
+            --card-bg: #FFFFFF;            /* Фон карточек */
+            --text-color: #1F2937;         /* Основной текст */
+            --text-secondary: #6B7280;    /* Второстепенный текст */
+            --border-color: #E5E7EB;       /* Границы полей */
+            --success-color: #10B981;     /* Успех */
+            --error-color: #EF4444;        /* Ошибка */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* Заголовок страницы */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Карточка формы */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* Поля ввода */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .form-group .required {
+            color: var(--error-color);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Подсказка для обязательного поля */
+        .form-group .hint {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* Кнопка генерации */
+        .btn-generate {
+            width: 100%;
+            padding: 14px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-generate:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-generate:active {
+            transform: scale(0.98);
+        }
+
+        /* Сообщение об ошибке */
+        .error-message {
+            background-color: #FEF2F2;
+            color: var(--error-color);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Блок готового поста */
+        .result-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .result-header h2 {
+            font-size: 20px;
+            color: var(--text-color);
+        }
+
+        .post-content {
+            background-color: #F3F4F6;
+            padding: 16px;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-color);
+            margin-bottom: 16px;
+        }
+
+        /* Кнопка копирования */
+        .btn-copy {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-copy:hover {
+            background-color: #059669;
+        }
+
+        .btn-copy:active {
+            transform: scale(0.98);
+        }
+
+        /* Сообщение после копирования */
+        .copy-message {
+            display: none;
+            color: var(--success-color);
+            font-weight: 500;
+            margin-left: 12px;
+        }
+
+        .copy-message.show {
+            display: inline;
+        }
+
+        /* Анимация загрузки */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок -->
+        <div class="header">
+            <h1>📝 Генератор постов для товаров</h1>
+            <p>Создавайте продающие посты за секунды</p>
+        </div>
+
+        <!-- Форма ввода -->
+        <div class="card">
+            <!-- Сообщение об ошибке -->
+            <div class="error-message" id="errorMessage"></div>
+
+            <!-- Название товара -->
+            <div class="form-group">
+                <label for="productName">Название товара</label>
+                <input type="text" id="productName" placeholder="Например: Умные часы">
+            </div>
+
+            <!-- Описание товара (обязательное) -->
+            <div class="form-group">
+                <label for="productDescription">
+                    Описание товара <span class="required">*</span>
+                </label>
+                <textarea id="productDescription" placeholder="Опишите товар: особенности, преимущества, характеристики"></textarea>
+                <div class="hint">Это поле обязательное - без него пост не сформировать</div>
+            </div>
+
+            <!-- Цена или выгода -->
+            <div class="form-group">
+                <label for="priceBenefit">Цена или выгода</label>
+                <input type="text" id="priceBenefit" placeholder="Например: 5000 руб или скидка 30%">
+            </div>
+
+            <!-- Настроение поста -->
+            <div class="form-group">
+                <label for="tone">Настроение поста</label>
+                <select id="tone">
+                    <option value="friendly">Дружелюбное 😊</option>
+                    <option value="energetic">Энергичное 🔥</option>
+                    <option value="professional">Профессиональное 💼</option>
+                    <option value="luxury">Премиум ✨</option>
+                </select>
+            </div>
+
+            <!-- Кнопка генерации -->
+            <button class="btn-generate" id="generateBtn">
+                Сформировать пост
+            </button>
+        </div>
+
+        <!-- Блок готового поста -->
+        <div class="result-card" id="resultCard">
+            <div class="result-header">
+                <h2>✅ Готовый пост</h2>
+            </div>
+            <div class="post-content" id="postContent"></div>
+            <button class="btn-copy" id="copyBtn">
+                📋 Скопировать пост
+            </button>
+            <span class="copy-message" id="copyMessage">Пост скопирован!</span>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // ПРОСТОЙ JAVASCRIPT - минимум кода, всё понятно
+        // ============================================================
+
+        // Получаем элементы страницы
+        const generateBtn = document.getElementById('generateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const resultCard = document.getElementById('resultCard');
+        const postContent = document.getElementById('postContent');
+        const copyMessage = document.getElementById('copyMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Функция генерации поста
+        async function generatePost() {
+            // Показываем состояние загрузки
+            generateBtn.classList.add('loading');
+            generateBtn.textContent = 'Генерация...';
+
+            // Скрываем предыдущие сообщения
+            errorMessage.classList.remove('show');
+            resultCard.classList.remove('show');
+
+            // Получаем данные из полей
+            const productName = document.getElementById('productName').value;
+            const productDescription = document.getElementById('productDescription').value;
+            const priceBenefit = document.getElementById('priceBenefit').value;
+            const tone = document.getElementById('tone').value;
+
+            try {
+                // Отправляем запрос на сервер
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        product_name: productName,
+                        product_description: productDescription,
+                        price_benefit: priceBenefit,
+                        tone: tone
+                    })
+                });
+
+                // Получаем ответ
+                const data = await response.json();
+
+                if (data.success) {
+                    // Показываем готовый пост
+                    postContent.textContent = data.post;
+                    resultCard.classList.add('show');
+                } else {
+                    // Показываем ошибку
+                    errorMessage.textContent = data.error;
+                    errorMessage.classList.add('show');
+                }
+
+            } catch (error) {
+                // Ошибка связи с сервером
+                errorMessage.textContent = 'Что-то пошло не так. Попробуйте ещё раз.';
+                errorMessage.classList.add('show');
+            }
+
+            // Возвращаем кнопку в исходное состояние
+            generateBtn.classList.remove('loading');
+            generateBtn.textContent = 'Сформировать пост';
+        }
+
+        // Функция копирования поста
+        function copyPost() {
+            // Получаем текст поста
+            const text = postContent.textContent;
+
+            // Копируем в буфер обмена
+            navigator.clipboard.writeText(text).then(() => {
+                // Показываем сообщение об успехе
+                copyMessage.classList.add('show');
+
+                // Скрываем сообщение через 2 секунды
+                setTimeout(() => {
+                    copyMessage.classList.remove('show');
+                }, 2000);
+            });
+        }
+
+        // Добавляем обработчики событий
+        generateBtn.addEventListener('click', generatePost);
+        copyBtn.addEventListener('click', copyPost);
+
+        // Разрешаем генерацию поста по Enter
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generatePost();
+            }
+        });
+    </script>
+</body>
+</html>
