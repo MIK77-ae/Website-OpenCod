@@ -264,25 +264,32 @@ FAVORITES_FILE = os.path.join(BASE_DIR, "favorites.json")
 SCHEDULED_FILE = os.path.join(BASE_DIR, "scheduled_posts.json")
 ```
 
-### Шаг 4 — Настройка Web-приложения
+### Шаг 4 — Настройка Flask (если выбрали Flask preset)
 
-1. **Web** → **Add a new web app** → **Manual configuration** → Python 3.x
-2. **WSGI file** → редактируйте, замените на:
+1. **Web** → найдите ваше приложение
+2. **WSGI configuration file** → редактировать
+3. Замените содержимое на:
 ```python
 import sys
 sys.path.insert(0, '/home/ВАШ-USERNAME/SiteGenPostSimp')
 
 from app import app as application
 ```
-3. **Static files** → добавить:
-   - URL: `/static/` → Directory: `/home/ВАШ-USERNAME/SiteGenPostSimp/static/`
+
+**Что такое WSGI?**
+WSGI (Web Server Gateway Interface) — это способ связи между веб-сервером (Apache на PythonAnywhere) и вашим Flask-приложением. Без него сервер не знает как запустить ваш сайт.
 
 ### Шаг 5: Установите зависимости
 
 **Bash console:**
 ```bash
-cd SiteGenPostSimp
-pip install flask requests
+cd ~/SiteGenPostSimp
+pip install --user flask requests
+```
+
+Проверьте:
+```bash
+pip list | findstr flask
 ```
 
 ### Шаг 6: Перезагрузите и проверьте
