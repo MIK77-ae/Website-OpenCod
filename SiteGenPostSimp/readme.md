@@ -204,6 +204,93 @@ MODEL_NAME = "gpt-5.4-mini"  # Рекомендуемая
 
 ---
 
+## ДЕПЛОЙ НА PYTHONANYWHERE
+
+### Шаг 1 — Локально: убедитесь что config.py не в Git
+
+```bash
+git ls-files | findstr config.py
+```
+
+Если выводит `config.py` — удалите из отслеживания:
+```bash
+git rm --cached config.py
+git commit -m "Удалён config.py из репозитория"
+```
+
+### Шаг 2 — На PythonAnywhere: Загрузите файлы
+
+Имя папки: `SiteGenPostSimp`
+
+**Загрузить:**
+```
+app.py
+api_client.py
+vk_client.py
+favorites.py
+scheduled.py
+config.py.example
+templates/index.html
+static/style.css
+requirements.txt
+```
+
+**НЕ загружать:**
+- `config.py` (там ваши ключи!)
+- `.gitignore`
+- `favorites.json`
+- `scheduled_posts.json`
+- `run.bat`
+
+### Шаг 3 — На PythonAnywhere: Создайте config.py
+
+В папке `SiteGenPostSimp` создайте файл `config.py`:
+```python
+import os
+
+PROXY_API_KEY = ""  # Вставьте ключ сюда
+PROXY_API_BASE_URL = "https://api.proxyapi.ru"
+MODEL_NAME = "gpt-5.4-mini"
+MAX_TOKENS = 800
+MAX_TOKENS_PARAM = "max_completion_tokens"
+TEMPERATURE = 0.9
+API_TIMEOUT = 60
+
+VK_ACCESS_TOKEN = ""  # Вставьте токен сюда
+VK_GROUP_ID = ""      # Вставьте ID группы сюда
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FAVORITES_FILE = os.path.join(BASE_DIR, "favorites.json")
+SCHEDULED_FILE = os.path.join(BASE_DIR, "scheduled_posts.json")
+```
+
+### Шаг 4 — Настройка Web-приложения
+
+1. **Web** → **Add a new web app** → **Manual configuration** → Python 3.x
+2. **WSGI file** → редактируйте, замените на:
+```python
+import sys
+sys.path.insert(0, '/home/ВАШ-USERNAME/SiteGenPostSimp')
+
+from app import app as application
+```
+3. **Static files** → добавить:
+   - URL: `/static/` → Directory: `/home/ВАШ-USERNAME/SiteGenPostSimp/static/`
+
+### Шаг 5: Установите зависимости
+
+**Bash console:**
+```bash
+cd SiteGenPostSimp
+pip install flask requests
+```
+
+### Шаг 6: Перезагрузите и проверьте
+
+**Web** → **Reload** → откройте ваш сайт.
+
+---
+
 ## ТРЕБОВАНИЯ
 
 - Python 3.7+
